@@ -9,7 +9,13 @@ class GuestSerializer(serializers.ModelSerializer):
                   'first_name',
                   'middle_name',
                   'last_name',
+                  'email',
                   'date_of_birth',
                   'account_created',
                   'membership'
                   )
+        
+class CreateGuestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = ('first_name','middle_name','last_name','date_of_birth','email')

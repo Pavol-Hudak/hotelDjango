@@ -20,6 +20,7 @@ class Guest(models.Model):
     first_name = models.CharField(max_length=NAME_LENGTH)
     middle_name = models.CharField(max_length=NAME_LENGTH)
     last_name = models.CharField(max_length=NAME_LENGTH)
+    email = models.EmailField(max_length=254,default='')
     date_of_birth = models.DateField()
-    account_created = models.DateField(auto_now_add=True)
+    account_created = models.DateTimeField(auto_now_add=True)
     membership = models.BooleanField(null=False, default=False)
