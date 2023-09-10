@@ -1,9 +1,14 @@
 from django.db import models
 from datetime import datetime
 import random
+from django.core.validators import MinLengthValidator
+from django.contrib.auth.models import (
+    BaseUserManager, AbstractBaseUser
+)
 
 # Create your models here.
 NAME_LENGTH = 20
+PASSWORD_MIN_LENGTH = 2
 
 
 
@@ -24,3 +29,35 @@ class Guest(models.Model):
     date_of_birth = models.DateField()
     account_created = models.DateTimeField(auto_now_add=True)
     membership = models.BooleanField(null=False, default=False)
+    password = models.CharField(default='',max_length=254,validators=[MinLengthValidator(PASSWORD_MIN_LENGTH,'Password must be at least 8 characters long')])
+    current_session = models.CharField(default='',max_length=254)
+
+
+class GuestManager(BaseUserManager):
+    def create_guest(self, first_name, middle_name, last_name, date_of_birth, email, password):
+        
+        guest = self.model(
+            first_name = first_name,
+            middle_name = middle_name,
+            last_name = last_name,
+            date_of_birth = date_of_birth,
+            email = GuestModel.normalize_email(email),
+        )
+        guest.set_password(password)
+        guest.save(using=self._db)
+        return guest
+
+class GuestModel(AbstractBaseUser):
+    email = models.EmailField(unique=True)  # Define the 'email' field
+    first_name = models.CharField(max_length=255)
+    middle_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    date_of_birth = models.DateField()
+    
+    # Specify the 'email' field as the username field
+    USERNAME_FIELD = 'email'
+    
+    # Specify other fields that are required when creating a user
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
+    objects = GuestManager()
+    

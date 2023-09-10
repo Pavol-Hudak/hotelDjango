@@ -12,10 +12,22 @@ class GuestSerializer(serializers.ModelSerializer):
                   'email',
                   'date_of_birth',
                   'account_created',
-                  'membership'
+                  'membership',
+                  'password',
+                  'current_session'
                   )
         
 class CreateGuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guest
-        fields = ('first_name','middle_name','last_name','date_of_birth','email')
+        fields = ('first_name','middle_name','last_name','date_of_birth','email','password')
+
+class LoginGuestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = ('email','password')
+
+class CurrentSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Guest
+        fields = ('current_session')
