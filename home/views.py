@@ -3,47 +3,38 @@ from django.http import HttpResponse
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import GuestSerializer, CreateGuestSerializer, LoginGuestSerializer, CurrentSessionSerializer
-from .models import Guest
+from .serializers import CreateGuestSerializer, GuestSerializer
+from .models import GuestModel
 import hashlib
 from django.contrib.auth.models import User
 
 class GuestView(generics.ListAPIView):
-    queryset = Guest.objects.all()
+    queryset = GuestModel.objects.all()
     serializer_class = GuestSerializer
 
 class CreateGuestView(APIView):
     serializer_class = CreateGuestSerializer
-
     def post(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-
         serializer = self.serializer_class(data=request.data)
+        print(serializer)
         if(serializer.is_valid()):
-            first_name = serializer.data.get('first_name')
-            middle_name = serializer.data.get('middle_name')
-            last_name = serializer.data.get('last_name')
-            date_of_birth = serializer.data.get('date_of_birth')
-            email = serializer.data.get('email')
-            plainPassword = str(serializer.data.get('password'))
-            hashedPass = hashlib.sha256(plainPassword.encode('utf-8')).hexdigest()
-            current_session = self.request.session.session_key
-
-            queryset = Guest.objects.filter(email=email)
-            if queryset.exists():
-                print("User exists")
-                return Response({"User with this email already exists"}, status=status.HTTP_226_IM_USED)
-            else:
-                '''newGuest = Guest(first_name=first_name, middle_name=middle_name,
-                              last_name=last_name, date_of_birth=date_of_birth, 
-                              email=email, password=hashedPass,current_session=current_session)
-                newGuest.save()'''
-
-            return Response(GuestSerializer(newGuest).data,status=status.HTTP_201_CREATED)
+            validated_data = serializer.validated_data
+            first_name = validated_data.get('first_name')
+            middle_name = validated_data.get('middle_name')
+            last_name = validated_data.get('last_name')
+            date_of_birth = validated_data.get('date_of_birth')
+            email = validated_data.get('email')
+            password = validated_data.get('password')
+            print(first_name,middle_name,last_name)
+            print(date_of_birth,email,password)
+            if GuestModel.objects.filter(email=email).exists():
+                return Response({"User exists"})
+            
+            newGuest = GuestModel.objects.create_guest(email=email, first_name=first_name, middle_name=middle_name, last_name=last_name, date_of_birth = date_of_birth, password=password)
+            return Response({"haha"})
         return Response({'Bad request':'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
     
-class LoginGuestView(APIView):
+'''class LoginGuestView(APIView):
     serializer_class = LoginGuestSerializer
     def post(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
@@ -62,17 +53,7 @@ class LoginGuestView(APIView):
                 else:
                     print("user not found")
                     return Response({"User not found"})
-        return Response({'Bad request':'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Bad request':'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)'''
 
-class CurrentSessionView(APIView):
-    serialized_class = CurrentSessionSerializer
-    def get(self, request):
-        serializer = self.serialized_class(data=request.data)
-        if(serializer.is_valid()):
-            current_session = serializer.data.get('current_session')
 
-    
-def login_guest(request):
-        
-        return render(request, 'index.html', {'key': 'value'})
 

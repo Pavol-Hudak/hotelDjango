@@ -1,7 +1,8 @@
 from django.db import models
 from datetime import datetime
 import random
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, validate_email
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
@@ -20,7 +21,7 @@ def generateMemberId():
     return member_id
 
 
-class Guest(models.Model):
+'''class Guest(models.Model):
     member_id = models.IntegerField(default=generateMemberId)
     first_name = models.CharField(max_length=NAME_LENGTH)
     middle_name = models.CharField(max_length=NAME_LENGTH)
@@ -31,28 +32,34 @@ class Guest(models.Model):
     membership = models.BooleanField(null=False, default=False)
     password = models.CharField(default='',max_length=254,validators=[MinLengthValidator(PASSWORD_MIN_LENGTH,'Password must be at least 8 characters long')])
     current_session = models.CharField(default='',max_length=254)
-
+'''
 
 class GuestManager(BaseUserManager):
-    def create_guest(self, first_name, middle_name, last_name, date_of_birth, email, password):
-        
+    def create_guest(self, email, first_name, middle_name, last_name, date_of_birth,  password):
+        try:
+            validate_email(email)
+        except ValidationError:
+            raise ValueError("Invalid email address")
         guest = self.model(
+            email = self.normalize_email(email),
             first_name = first_name,
             middle_name = middle_name,
             last_name = last_name,
-            date_of_birth = date_of_birth,
-            email = GuestModel.normalize_email(email),
+            date_of_birth = date_of_birth,    
         )
-        guest.set_password(password)
+        print(email)
+        if password:
+            guest.set_password(password)
         guest.save(using=self._db)
         return guest
 
 class GuestModel(AbstractBaseUser):
-    email = models.EmailField(unique=True)  # Define the 'email' field
+    email = models.EmailField()  # Define the 'email' field
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
+    
     
     # Specify the 'email' field as the username field
     USERNAME_FIELD = 'email'
