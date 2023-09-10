@@ -35,7 +35,7 @@ def generateMemberId():
 '''
 
 class GuestManager(BaseUserManager):
-    def create_guest(self, email, first_name, middle_name, last_name, date_of_birth,  password):
+    def create_guest(self, email, first_name, middle_name, last_name, date_of_birth, password):
         try:
             validate_email(email)
         except ValidationError:
@@ -45,7 +45,7 @@ class GuestManager(BaseUserManager):
             first_name = first_name,
             middle_name = middle_name,
             last_name = last_name,
-            date_of_birth = date_of_birth,    
+            date_of_birth = date_of_birth,
         )
         print(email)
         if password:
@@ -54,11 +54,12 @@ class GuestManager(BaseUserManager):
         return guest
 
 class GuestModel(AbstractBaseUser):
-    email = models.EmailField()  # Define the 'email' field
+    email = models.EmailField(unique=True)  # Define the 'email' field
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
+    member_id = models.CharField(default=generateMemberId, max_length=10)
     
     
     # Specify the 'email' field as the username field

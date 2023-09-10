@@ -8,6 +8,7 @@ from .models import GuestModel
 import hashlib
 from django.contrib.auth.models import User
 
+
 class GuestView(generics.ListAPIView):
     queryset = GuestModel.objects.all()
     serializer_class = GuestSerializer
@@ -30,7 +31,8 @@ class CreateGuestView(APIView):
             if GuestModel.objects.filter(email=email).exists():
                 return Response({"User exists"})
             
-            newGuest = GuestModel.objects.create_guest(email=email, first_name=first_name, middle_name=middle_name, last_name=last_name, date_of_birth = date_of_birth, password=password)
+            newGuest = GuestModel.objects.create_guest(email=email, first_name=first_name, middle_name=middle_name, last_name=last_name, 
+                                                       date_of_birth = date_of_birth, password=password)
             return Response({"haha"})
         return Response({'Bad request':'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
     

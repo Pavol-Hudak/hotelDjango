@@ -11,6 +11,7 @@ class GuestSerializer(serializers.ModelSerializer):
                   'email',
                   'date_of_birth',
                   'password',
+                  'member_id'
                   )
         
 class CreateGuestSerializer(serializers.ModelSerializer):
