@@ -60,7 +60,7 @@ class GuestModel(AbstractBaseUser):
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     member_id = models.CharField(default=generateMemberId, max_length=10)
-    
+    account_created = models.DateTimeField(auto_now=True)
     
     # Specify the 'email' field as the username field
     USERNAME_FIELD = 'email'
