@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import GuestModel
+from . models import GuestModel, RoomModel
 
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +28,8 @@ class LoginGuestSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=128)
+
+class CreateRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomModel
+        fields = ('capacity','room_type','price','description')

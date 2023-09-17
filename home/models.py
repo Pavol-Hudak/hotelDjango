@@ -20,20 +20,6 @@ def generateMemberId():
     member_id = ''.join(random.sample(combine_id, len(combine_id)))
     return member_id
 
-
-'''class Guest(models.Model):
-    member_id = models.IntegerField(default=generateMemberId)
-    first_name = models.CharField(max_length=NAME_LENGTH)
-    middle_name = models.CharField(max_length=NAME_LENGTH)
-    last_name = models.CharField(max_length=NAME_LENGTH)
-    email = models.EmailField(max_length=254,default='')
-    date_of_birth = models.DateField()
-    account_created = models.DateTimeField(auto_now_add=True)
-    membership = models.BooleanField(null=False, default=False)
-    password = models.CharField(default='',max_length=254,validators=[MinLengthValidator(PASSWORD_MIN_LENGTH,'Password must be at least 8 characters long')])
-    current_session = models.CharField(default='',max_length=254)
-'''
-
 class GuestManager(BaseUserManager):
     def create_guest(self, email, first_name, middle_name, last_name, date_of_birth, password):
         try:
@@ -68,4 +54,29 @@ class GuestModel(AbstractBaseUser):
     # Specify other fields that are required when creating a user
     REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth']
     objects = GuestManager()
+
+
+class RoomModel(models.Model):
+    ROOM_TYPES = [
+        ("D", "Double"),
+        ("K", "King"),
+        ("S", "Suite"),
+        ("P", "Presidential"),
+    ]
+    capacity = models.IntegerField(default=2)
+    room_type = models.CharField(max_length=254,default="Suite")
+    price = models.FloatField(default=0.0)
+    description = models.TextField(max_length=254)
+
+'''class ReservedRoomModel(models.Model):
+    room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE)
+
+class ReservationModel(models.Model):
+    guest_id = models.ForeignKey(GuestModel, on_delete=models.CASCADE)
+    room_id = models.ForeignKey(ReservedRoomModel, on_delete=models.CASCADE)
+    res_from = models.DateField()
+    res_until = models.DateField()'''
+        
+
+
     
