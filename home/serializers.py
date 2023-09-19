@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import GuestModel, RoomModel
+from . models import GuestModel, RoomModel, ReservationModel
 
 class GuestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,7 +12,10 @@ class GuestSerializer(serializers.ModelSerializer):
                   'date_of_birth',
                   'password',
                   'member_id',
-                  'account_created'
+                  'account_created',
+                  'is_staff',
+                  'is_superuser',
+                  'is_active'
                   )
         
 class CreateGuestSerializer(serializers.ModelSerializer):
@@ -32,4 +35,14 @@ class LoginSerializer(serializers.Serializer):
 class CreateRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomModel
-        fields = ('capacity','room_type','price','description')
+        fields = ('id','capacity','room_type','price','description')
+        
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReservationModel
+        fields = ('id','guest_id','room_id','res_from','res_until')
+
+class CreateReservationSerializer(serializers.Serializer):
+    persons = serializers.IntegerField()
+    checkInSearch = serializers.DateField()
+    checkOutSearch = serializers.DateField()

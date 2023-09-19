@@ -21,7 +21,8 @@ def generateMemberId():
     return member_id
 
 class GuestManager(BaseUserManager):
-    def create_guest(self, email, first_name, middle_name, last_name, date_of_birth, password):
+    def create_guest(self, email, first_name, middle_name, last_name, date_of_birth, password,**extra):
+        extra = {'is_staff': False, 'is_superuser': False, **extra, 'is_active': True}
         try:
             validate_email(email)
         except ValidationError:
@@ -32,13 +33,18 @@ class GuestManager(BaseUserManager):
             middle_name = middle_name,
             last_name = last_name,
             date_of_birth = date_of_birth,
+            **extra
         )
         print(email)
         if password:
             guest.set_password(password)
         guest.save(using=self._db)
         return guest
-
+    def create_superuser(self, email, password, **extra):
+        extra = {**extra,'is_staff': True, 'is_superuser': True, 'is_active': True}
+        superUser = self.create_guest(email=email, password=password, middle_name='', **extra)
+        return superUser
+    
 class GuestModel(AbstractBaseUser):
     email = models.EmailField(unique=True)  # Define the 'email' field
     first_name = models.CharField(max_length=255)
@@ -47,6 +53,16 @@ class GuestModel(AbstractBaseUser):
     date_of_birth = models.DateField()
     member_id = models.CharField(default=generateMemberId, max_length=10)
     account_created = models.DateTimeField(auto_now=True)
+
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+
+    def has_module_perms(self, app_label):
+        return self.is_superuser
     
     # Specify the 'email' field as the username field
     USERNAME_FIELD = 'email'
@@ -65,17 +81,17 @@ class RoomModel(models.Model):
     ]
     capacity = models.IntegerField(default=2)
     room_type = models.CharField(max_length=254,default="Suite")
-    price = models.FloatField(default=0.0)
+    price = models.IntegerField(default=0)
     description = models.TextField(max_length=254)
 
 '''class ReservedRoomModel(models.Model):
-    room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE)
+    room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE)'''
 
 class ReservationModel(models.Model):
     guest_id = models.ForeignKey(GuestModel, on_delete=models.CASCADE)
-    room_id = models.ForeignKey(ReservedRoomModel, on_delete=models.CASCADE)
+    room_id = models.ForeignKey(RoomModel, on_delete=models.CASCADE)
     res_from = models.DateField()
-    res_until = models.DateField()'''
+    res_until = models.DateField()
         
 
 
